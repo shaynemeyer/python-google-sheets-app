@@ -1,4 +1,5 @@
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from fastapi import HTTPException
 import os
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ class GoogleSheetsService:
         self.sheets_service = build("sheets", "v4", credentials=creds)
         self.drive_service = build("drive", "v3", credentials=creds)
 
-    def create_sheet(self, spreadsheet_name: str, sheet_title: str):
+    def create_spreadsheet(self, spreadsheet_name: str, sheet_title: str):
         try:
             body = {
                 "properties": {"title": spreadsheet_name},
@@ -42,5 +43,37 @@ class GoogleSheetsService:
             ).execute()
 
             return spreadsheet_id, share_link
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    def rename_spreadsheet(self, spreadsheet_id: str, new_name: str):
+        try:
+            request_body = {
+                "requests": [
+                    {
+                        "updateSpreadsheetProperties": {
+                            "properties": {"title": new_name},
+                            "fields": "title",
+                        }
+                    }
+                ]
+            }
+
+            result = self.sheets_service.batchUpdate(
+                spreadsheetId=spreadsheet_id,
+                body=request_body,
+            ).execute()
+
+            return result
+        except HttpError as error:
+            raise HTTPException(status_code=error.resp.status, detail=str(error))
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    def delete_spreadsheet(self, spreadsheet_id: str):
+        try:
+            self.drive_service.files().delete(fileId=spreadsheet_id).execute()
+        except HttpError as error:
+            raise HTTPException(status_code=error.resp.status, detail=str(error))
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
