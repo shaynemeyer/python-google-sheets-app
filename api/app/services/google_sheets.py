@@ -212,9 +212,7 @@ class GoogleSheetsService:
             all_headers = existing_headers
 
         for record in records:
-            row_values.extend(
-                [str(record.get(header, "")) for header in record_new_headers]
-            )
+            row_values.extend([str(record.get(header, "")) for header in all_headers])
 
             new_records.append(row_values)
 
