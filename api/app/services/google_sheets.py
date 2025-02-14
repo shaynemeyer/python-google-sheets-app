@@ -228,3 +228,70 @@ class GoogleSheetsService:
             insertDataOption="INSERT_ROWS",
             body=body,
         ).execute()
+
+    def append_records_autoincrement(
+        self,
+        spreadsheet_id: str,
+        worksheet_name: str,
+        records: List[Dict[str, Any]],
+    ):
+        existing_data = self.read_worksheet(spreadsheet_id, worksheet_name)
+
+        max_id = 0
+
+        for row in existing_data:
+            if "id" in row and str(row["id"]).isdigit():
+                max_id = max(max_id, int(row["id"]))
+
+        for i, record in enumerate(records, start=max_id + 1):
+            record["id"] = str(i)
+
+        self.append_records(spreadsheet_id, worksheet_name, records)
+
+    def add_worksheet(self, spreadsheet_id: str, worksheet_name: str):
+        request_body = {
+            "requests": [
+                {
+                    "addSheet": {
+                        "properties": {"title": worksheet_name},
+                    }
+                }
+            ]
+        }
+
+        result = self.sheets_service.batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body=request_body,
+        ).execute()
+
+        return result
+
+    def clear_worksheet(self, spreadsheet_id: str, worksheet_name: str):
+        result = self.sheets_service.values.clear(
+            spreadsheetId=spreadsheet_id, range=f"{worksheet_name}!A:ZZZ"
+        ).execute()
+
+        return result
+
+    def delete_worksheet(self, spreadsheet_id: str, worksheet_name: str):
+        worksheet = self.get_worksheet_by_name(
+            spreadsheet_id=spreadsheet_id, worksheet_name=worksheet_name
+        )
+        sheet_id = worksheet["properties"]["sheetId"]
+
+        request_body = {
+            "requests": [
+                {
+                    "deleteSheet": {
+                        "properties": {"sheetId": sheet_id},
+                    }
+                }
+            ]
+        }
+
+        result = self.sheets_service.batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body=request_body,
+        ).execute()
+
+        return result

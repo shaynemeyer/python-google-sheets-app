@@ -95,9 +95,61 @@ def append_records_to_worksheet(
     records: List[Dict[str, Any]] = Body(
         ..., description="The records to append to the worksheet"
     ),
+    auto_increment_id: bool = Query(
+        False, description="Whether to add an auto incrementing 'id' column"
+    ),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
-    service.append_records(
-        spreadsheet_id=spreadsheet_id, worksheet_name=worksheet_name, records=records
-    )
+    if auto_increment_id:
+        service.append_records_autoincrement(
+            spreadsheet_id=spreadsheet_id,
+            worksheet_name=worksheet_name,
+            records=records,
+        )
+    else:
+        service.append_records(
+            spreadsheet_id=spreadsheet_id,
+            worksheet_name=worksheet_name,
+            records=records,
+        )
+
     return {"message": "Records appended to the worksheet successfully"}
+
+
+@router.post("/{spreadsheet_id}/{worksheet_name}/add")
+@handle_exceptions
+def add_a_new_worksheet(
+    spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
+    worksheet_name: str = Path(..., description="The name of the worksheet"),
+    service: GoogleSheetsService = Depends(get_google_sheets_service),
+):
+    result = service.add_worksheet(
+        spreadsheet_id=spreadsheet_id, worksheet_name=worksheet_name
+    )
+    return {"result": result}
+
+
+@router.put("/{spreadsheet_id}/{worksheet_name}/clear")
+@handle_exceptions
+def clear_all_content_of_a_worksheet(
+    spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
+    worksheet_name: str = Path(..., description="The name of the worksheet"),
+    service: GoogleSheetsService = Depends(get_google_sheets_service),
+):
+    result = service.clear_worksheet(
+        spreadsheet_id=spreadsheet_id, worksheet_name=worksheet_name
+    )
+    return {"result": result}
+
+
+@router.delete("/{spreadsheet_id}/{worksheet_name}/delete")
+@handle_exceptions
+def delete_worksheet(
+    spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
+    worksheet_name: str = Path(..., description="The name of the worksheet"),
+    service: GoogleSheetsService = Depends(get_google_sheets_service),
+):
+    result = service.delete_worksheet(
+        spreadsheet_id=spreadsheet_id, worksheet_name=worksheet_name
+    )
+    return {"result": result}
