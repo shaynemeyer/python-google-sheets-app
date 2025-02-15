@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Path, Depends, Query, Body
+from app.dependencies.auth import get_current_user
 from app.dependencies.sheets import get_google_sheets_service
 from app.services.google_sheets import GoogleSheetsService
 from app.utils import handle_exceptions
@@ -29,6 +30,7 @@ def get_worksheets(
 def get_worksheet_properties_by_name(
     spreadsheet_id: str = Path(..., description="The Id of the Google Spreadsheet"),
     worksheet_name: str = Path(..., description="The name of the worksheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     sheet_object = service.get_worksheet_by_name(
@@ -44,6 +46,7 @@ def rename_worksheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
     worksheet_name: str = Path(..., description="The name of the worksheet"),
     new_name: str = Query(..., description="The new name for the worksheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     service.rename_worksheet(
@@ -58,6 +61,7 @@ def rename_worksheet(
 def read_worksheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
     worksheet_name: str = Path(..., description="The name of the worksheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     data = service.read_worksheet(spreadsheet_id, worksheet_name)
@@ -75,6 +79,7 @@ def write_to_worksheet(
     start_cell: str = Query(
         "A1", description="The cell where teh data insertions should start"
     ),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     service.write_to_worksheet(
@@ -98,6 +103,7 @@ def append_records_to_worksheet(
     auto_increment_id: bool = Query(
         False, description="Whether to add an auto incrementing 'id' column"
     ),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     if auto_increment_id:
@@ -121,6 +127,7 @@ def append_records_to_worksheet(
 def add_a_new_worksheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
     worksheet_name: str = Path(..., description="The name of the worksheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     result = service.add_worksheet(
@@ -134,6 +141,7 @@ def add_a_new_worksheet(
 def clear_all_content_of_a_worksheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
     worksheet_name: str = Path(..., description="The name of the worksheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     result = service.clear_worksheet(
@@ -147,6 +155,7 @@ def clear_all_content_of_a_worksheet(
 def delete_worksheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
     worksheet_name: str = Path(..., description="The name of the worksheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     result = service.delete_worksheet(

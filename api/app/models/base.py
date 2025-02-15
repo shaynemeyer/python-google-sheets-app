@@ -8,3 +8,8 @@ class CreateSheetRequest(BaseModel):
 
 class RenameRequest(BaseModel):
     new_name: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

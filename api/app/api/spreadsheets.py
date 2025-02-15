@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Path, Body
 from app.dependencies.sheets import get_google_sheets_service
+from app.dependencies.auth import get_current_user
 from app.services.google_sheets import GoogleSheetsService
 from app.models.base import CreateSheetRequest, RenameRequest
 from app.utils import handle_exceptions
@@ -11,6 +12,7 @@ router = APIRouter(prefix="/api", tags=["spreadsheets"])
 @handle_exceptions
 def create_spreadsheet(
     request: CreateSheetRequest,
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     # spreadsheet_id, url = service.create_sheet("Beautiful title", "sheet name")
@@ -26,6 +28,7 @@ def create_spreadsheet(
 def rename_spreadsheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
     request: RenameRequest = Body(..., description="The new name for the Spreadsheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     result = service.rename_spreadsheet(spreadsheet_id, request.new_name)
@@ -37,6 +40,7 @@ def rename_spreadsheet(
 @handle_exceptions
 def delete_spreadsheet(
     spreadsheet_id: str = Path(..., description="The ID of the Google Spreadsheet"),
+    current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
     service.delete_spreadsheet(spreadsheet_id)
