@@ -119,7 +119,7 @@ class GoogleSheetsService:
 
         result = (
             self.sheets_service.values()
-            .get(spreadsheet_id=spreadsheet_id, range=range_name)
+            .get(spreadsheetId=spreadsheet_id, range=range_name)
             .execute()
         )
 
@@ -129,7 +129,7 @@ class GoogleSheetsService:
             return []
 
         column_names = rows[0]
-        data = [dict(zip(column_names, row)) for row in rows[1]]
+        data = [dict(zip(column_names, row)) for row in rows[1:]]
 
         return data
 
