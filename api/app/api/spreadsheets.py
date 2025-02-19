@@ -8,7 +8,7 @@ from app.utils import handle_exceptions
 router = APIRouter(prefix="/api", tags=["spreadsheets"])
 
 
-@router.get("/spreadsheets/create")
+@router.post("/spreadsheets/create")
 @handle_exceptions
 def create_spreadsheet(
     request: CreateSheetRequest,

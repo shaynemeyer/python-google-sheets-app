@@ -3,7 +3,7 @@
 import { API_BASE_URL } from "@/lib/constants";
 import { useState } from "react";
 
-function LoginForm() {
+function LoginForm({ onLogin }: { onLogin: (loginToken: string) => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -25,9 +25,9 @@ function LoginForm() {
       if (!result.ok) {
         throw new Error(data.detail || "Failed to login");
       }
-
-      console.log(data);
       setLoginError("");
+      // console.log(data);
+      onLogin(data.access_token);
     } catch (error) {
       console.log(error);
       setLoginError("An error occurred while attempting to login");

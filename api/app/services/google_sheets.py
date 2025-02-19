@@ -12,7 +12,7 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 
 class GoogleSheetsService:
     def __init__(self, creds):
-        self.sheets_service = build("sheets", "v4", credentials=creds)
+        self.sheets_service = build("sheets", "v4", credentials=creds).spreadsheets()
         self.drive_service = build("drive", "v3", credentials=creds)
 
     def create_spreadsheet(self, spreadsheet_name: str, sheet_title: str):
