@@ -12,6 +12,12 @@ export default function Home() {
   };
 
   return (
-    <div>{!token ? <LoginForm onLogin={handleLogin} /> : <Dashboard />}</div>
+    <div>
+      {!token ? (
+        <LoginForm onLogin={handleLogin} />
+      ) : (
+        <Dashboard token={token} />
+      )}
+    </div>
   );
 }
