@@ -8,7 +8,13 @@ import { CartProduct, Product } from "@/types/product";
 import ProductCard from "../Products/ProductCard";
 import Cart from "../Cart/Cart";
 
-function Dashboard({ token }: { token: string }) {
+function Dashboard({
+  token,
+  onLogout,
+}: {
+  token: string;
+  onLogout: () => void;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<Array<Product>>([]);
   const [cart, setCart] = useState<Array<CartProduct>>([]);
@@ -58,15 +64,20 @@ function Dashboard({ token }: { token: string }) {
     return <div>Loading...</div>;
   }
 
-  console.log(cart);
   return (
     <div>
       <header className="bg-blue-500 text-white py-4 px-8 flex items-center justify-between">
         <h2 className="text-xl font-bold">Welcome!</h2>
         <div>
           <button
+            onClick={onLogout}
+            className="bg-white text-red-500 font-bold py-2 px-4 rounded-md hover:bg-gray-100 mr-4"
+          >
+            Logout
+          </button>
+          <button
             onClick={() => setIsCartOpen(true)}
-            className="bg-white text-blue-500 font-bold py-2 px-4 rounded-md hover:bg-gray-100"
+            className="bg-white text-blue-500 font-bold py-2 px-4 rounded-md hover:bg-gray-100 mr-4"
           >
             View Cart ({cart.length})
           </button>
