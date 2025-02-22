@@ -176,6 +176,7 @@ class GoogleSheetsService:
         worksheet_name: str,
         records: List[Dict[str, Any]],
     ):
+        print("Appending records", records)
         existing_data = self.read_worksheet(spreadsheet_id, worksheet_name)
 
         existing_headers = []
@@ -212,8 +213,7 @@ class GoogleSheetsService:
             all_headers = existing_headers
 
         for record in records:
-            row_values.extend([str(record.get(header, "")) for header in all_headers])
-
+            row_values = [str(record.get(header, "")) for header in all_headers]
             new_records.append(row_values)
 
         start_row = len(existing_data) + 1

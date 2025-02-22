@@ -106,6 +106,7 @@ def append_records_to_worksheet(
     current_user=Depends(get_current_user),
     service: GoogleSheetsService = Depends(get_google_sheets_service),
 ):
+    print("Auto incrementing id:", auto_increment_id)
     if auto_increment_id:
         service.append_records_autoincrement(
             spreadsheet_id=spreadsheet_id,

@@ -5,3 +5,7 @@ export type Product = {
   price: string;
   img_url: string;
 };
+
+export type CartProduct = Product & {
+  cartItemId: number;
+};

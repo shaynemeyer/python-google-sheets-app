@@ -4,13 +4,16 @@ import {
   SPREADSHEET_ID,
   INVENTORY_WORKSHEET_NAME,
 } from "@/lib/constants";
-import { Product } from "@/types/product";
+import { CartProduct, Product } from "@/types/product";
 import ProductCard from "../Products/ProductCard";
+import Cart from "../Cart/Cart";
 
 function Dashboard({ token }: { token: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<Array<Product>>([]);
-  const [cart, setCart] = useState<Array<Product>>([]);
+  const [cart, setCart] = useState<Array<CartProduct>>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItemId, setCartItemId] = useState(0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -37,8 +40,18 @@ function Dashboard({ token }: { token: string }) {
     fetchProducts();
   }, [token]);
 
-  const handleAddToCart = (product: Product) => {
-    setCart((prevCart) => [...prevCart, product]);
+  const handleAddToCart = (product: CartProduct) => {
+    setCart((prevCart) => [...prevCart, { ...product, cartItemId }]);
+    setCartItemId((prevId) => prevId + 1);
+  };
+
+  const handleRemoveFromCart = (cartItemId: number) => {
+    setCart((prevCart) => prevCart.filter((p) => p.cartItemId !== cartItemId));
+  };
+
+  const handleOnSuccessfulCheckout = () => {
+    setCart([]);
+    setIsCartOpen(false);
   };
 
   if (isLoading) {
@@ -51,7 +64,10 @@ function Dashboard({ token }: { token: string }) {
       <header className="bg-blue-500 text-white py-4 px-8 flex items-center justify-between">
         <h2 className="text-xl font-bold">Welcome!</h2>
         <div>
-          <button className="bg-white text-blue-500 font-bold py-2 px-4 rounded-md hover:bg-gray-100">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="bg-white text-blue-500 font-bold py-2 px-4 rounded-md hover:bg-gray-100"
+          >
             View Cart ({cart.length})
           </button>
         </div>
@@ -69,6 +85,15 @@ function Dashboard({ token }: { token: string }) {
           </div>
         )}
       </div>
+      {isCartOpen && (
+        <Cart
+          cart={cart}
+          onClose={() => setIsCartOpen(false)}
+          onRemoveFromCart={handleRemoveFromCart}
+          token={token}
+          onSuccessfulCheckout={handleOnSuccessfulCheckout}
+        />
+      )}
     </div>
   );
 }
